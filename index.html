@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Merry Christmas, Nikolinha</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --text: rgba(255,255,255,.96);
+      --muted: rgba(255,255,255,.84);
+      --shadow: rgba(0,0,0,.60);
+
+      --gold1: rgba(255, 246, 220, .98);
+      --gold2: rgba(255, 214, 138, .98);
+      --gold3: rgba(255, 170, 90, .92);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:#0b1020; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; color:var(--text); }
+
+    .card{
+      height:100%;
+      position:relative;
+      overflow:hidden;
+      background:#0b1020;
+      isolation:isolate;
+    }
+
+    /* Background */
+    .bg{
+      position:absolute; inset:0;
+      background:url("bg.jpeg") center/cover no-repeat;
+      transform:scale(1.02);
+      filter: contrast(1.06) saturate(1.06);
+      z-index:0;
+    }
+
+    /* Atmosphere */
+    .vignette{
+      position:absolute; inset:0;
+      background: radial-gradient(120% 90% at 50% 35%, transparent 38%, rgba(0,0,0,.60) 100%);
+      opacity:.55;
+      pointer-events:none;
+      z-index:1;
+    }
+    .grade{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(80% 55% at 50% 8%, rgba(255,220,150,.18), transparent 70%),
+        radial-gradient(60% 45% at 15% 15%, rgba(255,255,255,.10), transparent 65%);
+      mix-blend-mode: screen;
+      opacity:.55;
+      pointer-events:none;
+      z-index:1;
+    }
+
+    canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:2; }
+
+    /* Intro (letters only) */
+    .intro{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      z-index:3;
+      pointer-events:none;
+      padding: 16px;
+    }
+
+    .introBox{
+      text-align:center;
+      max-width: min(92vw, 900px);
+    }
+
+    .line{
+      margin:0;
+      font-family:"Great Vibes", cursive;
+      font-weight:400;
+      line-height:1.02;
+      letter-spacing:.15px;
+
+      color:transparent;
+      background: linear-gradient(180deg, var(--gold1) 0%, var(--gold2) 45%, var(--gold3) 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+
+      text-shadow:
+        0 14px 40px rgba(0,0,0,.65),
+        0 0 26px rgba(255,210,140,.14);
+      filter: drop-shadow(0 0 18px rgba(255,210,140,.10));
+
+      display:inline-block;
+      position:relative;
+      overflow:hidden;
+      padding: 2px 6px;
+      will-change: transform, opacity;
+    }
+
+    /* subtle shimmer */
+    .line::after{
+      content:"";
+      position:absolute;
+      top:-30%;
+      left:-70%;
+      width:55%;
+      height:160%;
+      transform: skewX(-18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.22) 45%, rgba(255,255,255,0) 100%);
+      mix-blend-mode: screen;
+      opacity:.55;
+      animation: shimmer 4.6s ease-in-out infinite;
+      pointer-events:none;
+    }
+
+    @keyframes shimmer{
+      0%{ left:-70%; opacity:0; }
+      12%{ opacity:.40; }
+      45%{ opacity:.55; }
+      100%{ left:120%; opacity:0; }
+    }
+
+    #merry{
+      font-size: clamp(46px, 11vw, 90px);
+      transform-origin: 50% 80%;
+      opacity:0;
+      transform: translateY(12px) scale(.92);
+    }
+    #name{
+      font-size: clamp(40px, 9.6vw, 78px);
+      margin-top: 2px;
+      opacity:0;
+      transform: translateY(10px) scale(.94);
+    }
+
+    .smallHint{
+      margin:10px 0 0;
+      font-size: clamp(12px, 3.1vw, 15px);
+      font-weight: 800;
+      color: var(--gold2);
+      text-shadow: 0 12px 26px rgba(0,0,0,.55);
+      opacity:0;
+      transform: translateY(6px);
+    }
+
+    .show1 #merry{ animation: popIn .9s cubic-bezier(.2,.9,.2,1) forwards; }
+    .show2 #name{ animation: popIn .9s cubic-bezier(.2,.9,.2,1) forwards; }
+    .show2 .smallHint{ animation: hintIn .7s ease forwards; animation-delay:.2s; }
+
+    @keyframes popIn{
+      0%{ opacity:0; transform: translateY(14px) scale(.90); filter: blur(1px); }
+      60%{ opacity:1; transform: translateY(0px) scale(1.03); }
+      100%{ opacity:1; transform: translateY(0px) scale(1.0); filter: blur(0px); }
+    }
+    @keyframes hintIn{ to{ opacity:.95; transform: translateY(0); } }
+
+    .fadeOut{ animation: fadeAway 1.1s ease forwards; }
+    @keyframes fadeAway{ to{ opacity:0; transform: translateY(-8px) scale(.99); } }
+
+    /* Menu */
+    .menuBtn{
+      position:absolute;
+      right: max(14px, env(safe-area-inset-right));
+      top: max(14px, env(safe-area-inset-top));
+      z-index:6;
+      width:46px; height:46px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.30);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 36px rgba(0,0,0,.35);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      opacity:.85;
+    }
+
+    .burger{ width:18px; height:12px; position:relative; }
+    .burger span{
+      position:absolute; left:0; right:0;
+      height:2px; border-radius:2px;
+      background: rgba(255,255,255,.92);
+      transition: transform .18s ease, top .18s ease, opacity .18s ease;
+    }
+    .burger span:nth-child(1){ top:0; }
+    .burger span:nth-child(2){ top:5px; opacity:.9; }
+    .burger span:nth-child(3){ top:10px; opacity:.85; }
+    .open .burger span:nth-child(1){ top:5px; transform: rotate(45deg); }
+    .open .burger span:nth-child(2){ opacity:0; }
+    .open .burger span:nth-child(3){ top:5px; transform: rotate(-45deg); }
+
+    .scrim{
+      position:absolute; inset:0;
+      z-index:5;
+      background: rgba(0,0,0,.18);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease;
+    }
+    .scrim.open{ opacity:1; pointer-events:auto; }
+
+    .panel{
+      position:absolute;
+      right: max(12px, env(safe-area-inset-right));
+      top: calc(max(14px, env(safe-area-inset-top)) + 56px);
+      z-index:7;
+      width: min(330px, calc(100vw - 28px));
+      padding:12px;
+      border-radius:20px;
+      background:
+        radial-gradient(60% 80% at 15% 10%, rgba(255,220,150,.10), transparent 60%),
+        linear-gradient(180deg, rgba(10,12,18,.48), rgba(10,12,18,.24));
+      border: 1px solid rgba(255,220,150,.18);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 22px 60px rgba(0,0,0,.45);
+      transform: translateY(-8px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .panel.open{ opacity:1; transform: translateY(0); pointer-events:auto; }
+
+    .panel h3{
+      margin:4px 4px 10px;
+      font-size:13px;
+      letter-spacing:.2px;
+      opacity:.95;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+    }
+    .panel h3 .dot{
+      width:9px;height:9px;border-radius:99px;
+      background: rgba(255,220,150,.95);
+      box-shadow: 0 0 18px rgba(255,220,150,.35);
+      margin-right:6px;
+    }
+    .panel h3 .left{ display:flex; align-items:center; }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin:8px 0; }
+    .btn{
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.10);
+      color: rgba(255,255,255,.96);
+      font-weight: 900;
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(255,220,150,.22), rgba(255,255,255,.08));
+      border-color: rgba(255,220,150,.30);
+    }
+    .meta{ margin:8px 4px 2px; font-size:12px; color: rgba(255,255,255,.82); line-height:1.35; }
+    .slider{ width:100%; accent-color: rgb(255,220,150); }
+  </style>
+</head>
+
+<body>
+  <div class="card" id="card">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="grade" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <canvas id="snow"></canvas>
+
+    <!-- Intro texts (letters only) -->
+    <div class="intro" id="intro">
+      <div class="introBox" id="introBox">
+        <p class="line" id="merry">Merry Christmas</p><br>
+        <p class="line" id="name">Nikolinha</p>
+        <div class="smallHint">Wishing you a magical Christmas ✨</div>
+      </div>
+    </div>
+
+    <audio id="music" preload="auto" loop>
+      <source src="https://commons.wikimedia.org/wiki/Special:FilePath/We%20Wish%20you%20a%20Merry%20Christmas%20(ISRC%20USUAN1100369).mp3" type="audio/mpeg">
+      <source src="https://commons.wikimedia.org/wiki/Special:FilePath/We%20Wish%20you%20a%20Merry%20Christmas%20(Kevin%20MacLeod%20)%20(ISRC%20USUAN1100369).oga" type="audio/ogg">
+    </audio>
+
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+    <button class="menuBtn" id="menuBtn" aria-label="Open menu">
+      <div class="burger" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+
+    <div class="panel" id="panel" role="dialog" aria-label="Menu">
+      <h3>
+        <span class="left"><span class="dot"></span>Controls</span>
+        <span id="musicState" style="opacity:.85;font-weight:900;font-size:12px;">🎶 off</span>
+      </h3>
+
+      <div class="row">
+        <button class="btn primary" id="play">▶️ Play</button>
+        <button class="btn" id="sparkle">✨ Sparkle</button>
+        <button class="btn" id="moreSnow">❄️ More snow</button>
+        <button class="btn" id="replay">🔁 Replay</button>
+      </div>
+
+      <div class="meta">Volume</div>
+      <input class="slider" id="vol" type="range" min="0" max="1" step="0.01" value="0.7" />
+
+      <div class="meta">Tip: on mobile, audio only starts after tapping Play.</div>
+    </div>
+  </div>
+
+  <script>
+    const card = document.getElementById("card");
+    const snowCanvas = document.getElementById("snow");
+    const snowCtx = snowCanvas.getContext("2d");
+
+    const intro = document.getElementById("intro");
+    const introBox = document.getElementById("introBox");
+
+    const music = document.getElementById("music");
+    const playBtn = document.getElementById("play");
+    const sparkleBtn = document.getElementById("sparkle");
+    const moreSnowBtn = document.getElementById("moreSnow");
+    const replayBtn = document.getElementById("replay");
+    const vol = document.getElementById("vol");
+    const musicState = document.getElementById("musicState");
+
+    const menuBtn = document.getElementById("menuBtn");
+    const panel = document.getElementById("panel");
+    const scrim = document.getElementById("scrim");
+
+    const rand = (a,b)=>a+Math.random()*(b-a);
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+    function resize(){
+      const r = card.getBoundingClientRect();
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      snowCanvas.width = Math.floor(r.width*dpr);
+      snowCanvas.height = Math.floor(r.height*dpr);
+      snowCanvas.style.width = r.width+"px";
+      snowCanvas.style.height = r.height+"px";
+      snowCtx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    addEventListener("resize", resize, {passive:true});
+    resize();
+
+    // Snow
+    const flakes = [];
+    function initFlakes(){
+      flakes.length = 0;
+      const w = snowCanvas.clientWidth, h = snowCanvas.clientHeight;
+      const count = Math.floor(Math.min(190, Math.max(110, w*h/2200)));
+      for(let i=0;i<count;i++){
+        flakes.push({
+          x: rand(0,w), y: rand(0,h),
+          r: rand(0.8, 2.6),
+          vy: rand(26, 85),
+          vx: rand(-10, 10),
+          a: rand(0.18, 0.65),
+          wobble: rand(0.6, 2.0),
+          tw: rand(0, Math.PI*2),
+        });
+      }
+    }
+    initFlakes();
+    addEventListener("resize", initFlakes, {passive:true});
+
+    let t = 0;
+    let sparkle = 0;
+    let snowBoost = 1;
+    let last = performance.now();
+
+    function sparkleUp(){ sparkle = clamp(sparkle + 1.0, 0, 2.4); }
+
+    function loop(now){
+      const w = snowCanvas.clientWidth, h = snowCanvas.clientHeight;
+      const dt = Math.min(0.033, (now-last)/1000);
+      last = now;
+
+      snowCtx.clearRect(0,0,w,h);
+      const wind = 0.7*Math.sin(t*0.35) + 0.25*Math.sin(t*1.1);
+
+      for(const f of flakes){
+        f.y += f.vy * dt * snowBoost;
+        f.x += (f.vx + wind*14) * dt + Math.sin((f.y*0.012)+t+f.tw)*f.wobble;
+
+        if(f.y > h + 10){ f.y = -10; f.x = rand(0,w); }
+        if(f.x < -20) f.x = w + 20;
+        if(f.x > w + 20) f.x = -20;
+
+        if(sparkle > 0.02 && Math.random() < 0.03){
+          const glow = 14 + sparkle*18;
+          const g2 = snowCtx.createRadialGradient(f.x,f.y,0, f.x,f.y,glow);
+          g2.addColorStop(0, `rgba(255,225,170,${0.08 + sparkle*0.09})`);
+          g2.addColorStop(1, "rgba(255,225,170,0)");
+          snowCtx.fillStyle = g2;
+          snowCtx.beginPath(); snowCtx.arc(f.x,f.y,glow,0,Math.PI*2); snowCtx.fill();
+        }
+
+        snowCtx.globalAlpha = f.a;
+        snowCtx.fillStyle = "rgba(246,251,255,1)";
+        snowCtx.beginPath(); snowCtx.arc(f.x,f.y,f.r,0,Math.PI*2); snowCtx.fill();
+      }
+      snowCtx.globalAlpha = 1;
+
+      sparkle *= 0.92;
+      snowBoost = 1 + (snowBoost-1)*0.92;
+
+      t += dt;
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // Sequence (no fireworks)
+    function startSequence(){
+      intro.style.display = "grid";
+      introBox.classList.remove("fadeOut");
+      intro.classList.remove("show1","show2");
+
+      setTimeout(()=> intro.classList.add("show1"), 120);
+      setTimeout(()=> intro.classList.add("show2"), 1150);
+
+      // fade texts out
+      setTimeout(()=> introBox.classList.add("fadeOut"), 4200);
+
+      // leave only background + snow
+      setTimeout(()=> { intro.style.display = "none"; }, 5400);
+    }
+    startSequence();
+
+    // Menu
+    function openMenu(){
+      menuBtn.classList.add("open");
+      panel.classList.add("open");
+      scrim.classList.add("open");
+    }
+    function closeMenu(){
+      menuBtn.classList.remove("open");
+      panel.classList.remove("open");
+      scrim.classList.remove("open");
+    }
+    function toggleMenu(){ panel.classList.contains("open") ? closeMenu() : openMenu(); }
+
+    menuBtn.addEventListener("click", (e)=>{ e.stopPropagation(); toggleMenu(); });
+    scrim.addEventListener("click", closeMenu);
+    addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeMenu(); });
+
+    // Music
+    music.volume = Number(vol.value);
+    vol.addEventListener("input", ()=> music.volume = Number(vol.value));
+
+    function setState(){
+      musicState.textContent = music.paused ? "🎶 off" : "🎶 on";
+      playBtn.textContent = music.paused ? "▶️ Play" : "⏸️ Pause";
+    }
+    setState();
+
+    async function toggleMusic(){
+      try{
+        if(music.paused) await music.play();
+        else music.pause();
+      }catch(e){}
+      setState();
+    }
+    playBtn.addEventListener("click", (e)=>{ e.stopPropagation(); toggleMusic(); });
+
+    sparkleBtn.addEventListener("click", (e)=>{ e.stopPropagation(); sparkleUp(); });
+    moreSnowBtn.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      snowBoost = clamp(snowBoost + 0.9, 1, 3.2);
+    });
+
+    replayBtn.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      closeMenu();
+      startSequence();
+    });
+
+    card.addEventListener("click", ()=> sparkleUp());
+  </script>
+</body>
+</html>
+
+
+
+
+
+
